@@ -1,0 +1,27 @@
+﻿<Page
+    x:Class="CryptographyCapstone.Pages.SHA256Page"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CryptographyCapstone.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="InputBox" Margin="10,10,10,0" PlaceholderText="Input" AcceptsReturn="True" TextChanged="InputBox_TextChanged" FontSize="20"/>
+
+        <StackPanel Grid.Row="1" Margin="10,10,10,10" >
+            <TextBox x:Name="HexOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Hexadecimal" IsReadOnly="True" FontSize="20"/>
+            <TextBox x:Name="DecOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Decimal" IsReadOnly="True" FontSize="20"/>
+            <TextBox x:Name="BinOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Binary" IsReadOnly="True"/>
+            <TextBox x:Name="ASCIIOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in ASCII" IsReadOnly="True" FontSize="20"/>
+        </StackPanel>
+
+    </Grid>
+</Page>
