@@ -16,6 +16,17 @@
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph=""/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Cryptoanalyzer">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Fabric MDL2 Assets" Glyph="&#xE721;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="First Derivative Cipher">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Fabric MDL2 Assets" Glyph="&#xE9E6;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+
         </NavigationView.MenuItems>
         
         <Frame x:Name="MainFrame">

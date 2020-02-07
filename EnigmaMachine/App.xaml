@@ -1,0 +1,25 @@
+﻿<Application
+    x:Class="EnigmaMachine.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:EnigmaMachine">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+                <ResourceDictionary>
+                    <SolidColorBrush x:Key="UnlitBackgroundColor" Color="{ThemeResource SystemChromeMediumColor}"/>
+                    <SolidColorBrush x:Key="UnlitForegroundColor" Color="{ThemeResource SystemBaseHighColor}"/>
+
+                    <SolidColorBrush x:Key="LitBackgroundColor" Color="{ThemeResource SystemAccentColor}"/>
+                    <SolidColorBrush x:Key="LitForegroundColor" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+
+                    <SolidColorBrush x:Key="LitAltBackgroundColor" Color="{ThemeResource SystemAccentColorLight3}"/>
+                </ResourceDictionary>
+                
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

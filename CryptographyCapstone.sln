@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptographyCapstone", "Cry
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PasswordExperiment", "PasswordExperiment\PasswordExperiment.csproj", "{631F3077-73C5-4846-80B2-460BB8E2A3CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnigmaMachine", "EnigmaMachine\EnigmaMachine.csproj", "{919EAC38-4E97-40F3-97D9-75A4B53A2322}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,32 @@ Global
 		{631F3077-73C5-4846-80B2-460BB8E2A3CC}.Release|x64.Build.0 = Release|Any CPU
 		{631F3077-73C5-4846-80B2-460BB8E2A3CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{631F3077-73C5-4846-80B2-460BB8E2A3CC}.Release|x86.Build.0 = Release|Any CPU
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM.ActiveCfg = Debug|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM.Build.0 = Debug|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM.Deploy.0 = Debug|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM64.Build.0 = Debug|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x64.ActiveCfg = Debug|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x64.Build.0 = Debug|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x64.Deploy.0 = Debug|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x86.ActiveCfg = Debug|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x86.Build.0 = Debug|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Debug|x86.Deploy.0 = Debug|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|Any CPU.ActiveCfg = Release|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM.ActiveCfg = Release|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM.Build.0 = Release|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM.Deploy.0 = Release|ARM
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM64.ActiveCfg = Release|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM64.Build.0 = Release|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|ARM64.Deploy.0 = Release|ARM64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x64.ActiveCfg = Release|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x64.Build.0 = Release|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x64.Deploy.0 = Release|x64
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x86.ActiveCfg = Release|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x86.Build.0 = Release|x86
+		{919EAC38-4E97-40F3-97D9-75A4B53A2322}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

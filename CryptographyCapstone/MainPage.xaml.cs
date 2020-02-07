@@ -39,6 +39,14 @@ namespace CryptographyCapstone
                 case "SHA-256":
                     MainFrame.Navigate(typeof(Pages.SHA256Page));
                     break;
+
+                case "Cryptoanalyzer":
+                    MainFrame.Navigate(typeof(Pages.CryptoanalyzerPage));
+                    break;
+
+                case "First Derivative Cipher":
+                    MainFrame.Navigate(typeof(Pages.FirstDerivativeCipherPage));
+                    break;
             }
             
         }

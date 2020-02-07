@@ -1,0 +1,137 @@
+﻿<Page
+    x:Class="EnigmaMachine.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:EnigmaMachine"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls="using:EnigmaMachine.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <TextBlock Text="The Enigma Machine" FontSize="40" FontFamily="Tw Cen MT" VerticalAlignment="Top" TextAlignment="Center" />
+
+        <Button x:Name="ResetButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{ThemeResource AccentButtonStyle}" Margin="0,5,5,0" Click="ResetButton_Click">
+            <SymbolIcon Symbol="Refresh"/>
+        </Button>
+
+        <winui:TwoPaneView Margin="0,50,0,0" PanePriority="Pane2">
+            <winui:TwoPaneView.Pane1>
+                <TextBox x:Name="PlainInputBox" TextChanged="PlainInputBox_TextChanged"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         PlaceholderText="Type your message in plain text here" KeyDown="PlainInputBox_KeyDown"/>
+            </winui:TwoPaneView.Pane1>
+
+            <winui:TwoPaneView.Pane2>
+                <toolkit:DockPanel Margin="10,0,10,10">
+                    <StackPanel Orientation="Horizontal" toolkit:DockPanel.Dock="Top" Margin="5,0,5,0">
+                        <ComboBox x:Name="RotorASel"/>
+                        <winui:NumberBox x:Name="RotaryA" Margin="5,0,10,0"/>
+                        <ComboBox x:Name="RotorBSel" Margin="5,0,0,0"/>
+                        <winui:NumberBox x:Name="RotaryB" Margin="5,0,10,0"/>
+                        <ComboBox x:Name="RotorCSel" Margin="5,0,0,0"/>
+                        <winui:NumberBox x:Name="RotaryC" Margin="5,0,10,0"/>
+                    </StackPanel>
+
+                    <Grid toolkit:DockPanel.Dock="Bottom">
+                        <TextBlock Text="Cipher text:" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
+                        <TextBox x:Name="CipherOutputBox" Margin="0,25,0,0" IsReadOnly="True" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                    </Grid>
+
+                    <Viewbox>
+                        <StackPanel x:Name="LightboardLayout">
+                            <StackPanel x:Name="Lightboard1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Grid x:Name="LightQ" Width="50" Height="50" Background="{StaticResource SystemAccentColorLight3}">
+                                    <TextBlock Text="Q" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightW" Width="50" Height="50" Background="{StaticResource SystemBaseLowColor}">
+                                    <TextBlock Text="W" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightE" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="E" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightR" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="R" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightT" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="T" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightZ" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="Z" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightU" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="U" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightI" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="I" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightO" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="O" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel x:Name="Lightboard2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Grid x:Name="LightA" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="A" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightS" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="S" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightD" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="D" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightF" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="F" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightG" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="G" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightH" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="H" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightJ" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="J" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightK" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="K" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                            <StackPanel x:Name="Lightboard3" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Grid x:Name="LightP" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="P" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightY" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="Y" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightX" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="X" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightC" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="C" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightV" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="V" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightB" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="B" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightN" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="N" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightM" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="M" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid x:Name="LightL" Width="50" Height="50" Background="{ThemeResource SystemBaseLowColor}">
+                                    <TextBlock Text="L" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Viewbox>
+                </toolkit:DockPanel>
+            </winui:TwoPaneView.Pane2>
+
+        </winui:TwoPaneView>
+    </Grid>
+</Page>
