@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using CryptographyCapstone.Lib;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -23,16 +15,12 @@ namespace CryptographyCapstone.Pages
     /// </summary>
     public sealed partial class CryptoanalyzerPage : Page
     {
-        private enum EncryptionMethods
-        {
-            Shift, Substitution, Polyalphabetic, Vigenere, OneTimePad, Affine, Polynomial
-        }
 
         public CryptoanalyzerPage()
         {
             this.InitializeComponent();
 
-            var _enumval = Enum.GetValues(typeof(EncryptionMethods)).Cast<EncryptionMethods>();
+            var _enumval = Enum.GetValues(typeof(Cryptoanalyzer.EncryptionMethods)).Cast<Cryptoanalyzer.EncryptionMethods>();
             EncryptionMethodBox.ItemsSource = _enumval.ToList();
         }
 
@@ -84,28 +72,32 @@ namespace CryptographyCapstone.Pages
             string plainText = InputBox.Text;
             string rawKey = KeyBox.Text;
             string cipherText = "";
-            switch ((EncryptionMethods)EncryptionMethodBox.SelectedIndex)
+            switch ((Cryptoanalyzer.EncryptionMethods)EncryptionMethodBox.SelectedIndex)
             {
-                case EncryptionMethods.Shift:
-                    cipherText = Lib.Cryptoanalyzer.EncryptShiftCipher(plainText, Int32.Parse(rawKey));
+                case Cryptoanalyzer.EncryptionMethods.Shift:
+                    cipherText = Cryptoanalyzer.EncryptShiftCipher(plainText, Int32.Parse(rawKey));
                     break;
 
-                case EncryptionMethods.OneTimePad:
-                    cipherText = Lib.Cryptoanalyzer.EncryptOneTimePad(plainText, rawKey);
+                case Cryptoanalyzer.EncryptionMethods.OneTimePad:
+                    cipherText = Cryptoanalyzer.EncryptOneTimePad(plainText, rawKey);
                     break;
 
-                case EncryptionMethods.Affine:
+                case Cryptoanalyzer.EncryptionMethods.Affine:
                     string[] keys = rawKey.Split(',', ';', ':', ' ');
-                    cipherText = Lib.Cryptoanalyzer.EncryptAffine(plainText,
+                    cipherText = Cryptoanalyzer.EncryptAffineCipher(plainText,
                         Int32.Parse(keys[0]), Int32.Parse(keys[1]));
                     break;
 
-                case EncryptionMethods.Polynomial:
-                    var polynomials = Lib.PolynomialCipher.EncodeMessage(InputBox.Text, Int32.Parse(rawKey));
+                case Cryptoanalyzer.EncryptionMethods.Polynomial:
+                    var polynomials = PolynomialCipher.EncodeMessage(InputBox.Text, Int32.Parse(rawKey));
                     foreach (string output in polynomials)
                     {
                         cipherText += output + "\r\n";
                     }
+                    break;
+
+                case Cryptoanalyzer.EncryptionMethods.Multiplicative:
+                    cipherText = Cryptoanalyzer.EncryptMultiplicativeCipher(plainText, Int32.Parse(rawKey));
                     break;
             }
             OutputBox.Text = cipherText;
@@ -116,21 +108,21 @@ namespace CryptographyCapstone.Pages
             string cipherText = InputBox.Text;
             string rawKey = KeyBox.Text;
             string plainText = "";
-            switch ((EncryptionMethods)EncryptionMethodBox.SelectedIndex)
+            switch ((Cryptoanalyzer.EncryptionMethods)EncryptionMethodBox.SelectedIndex)
             {
-                case EncryptionMethods.Shift:
-                    plainText = Lib.Cryptoanalyzer.DecryptShiftCipher(cipherText, Int32.Parse(rawKey));
+                case Cryptoanalyzer.EncryptionMethods.Shift:
+                    plainText = Cryptoanalyzer.DecryptShiftCipher(cipherText, Int32.Parse(rawKey));
                     break;
 
-                case EncryptionMethods.OneTimePad:
-                    plainText = Lib.Cryptoanalyzer.DecryptOneTimePad(cipherText, rawKey);
+                case Cryptoanalyzer.EncryptionMethods.OneTimePad:
+                    plainText = Cryptoanalyzer.DecryptOneTimePad(cipherText, rawKey);
                     break;
 
-                case EncryptionMethods.Affine:
+                case Cryptoanalyzer.EncryptionMethods.Affine:
                     string[] keys = rawKey.Split(',', ';', ':', ' ');
                     try
                     {
-                        plainText = Lib.Cryptoanalyzer.DecryptAffine(cipherText,
+                        plainText = Cryptoanalyzer.DecryptAffineCipher(cipherText,
                             Int32.Parse(keys[0]), Int32.Parse(keys[1]));
                     }
                     catch (ArgumentException ex)
@@ -144,7 +136,7 @@ namespace CryptographyCapstone.Pages
                     }
                     break;
 
-                case EncryptionMethods.Polynomial:
+                case Cryptoanalyzer.EncryptionMethods.Polynomial:
                     // Parse the polynomials and decode them
                     List<List<double>> coeffs = new List<List<double>>();
                     string[] inputPolynomials = InputBox.Text.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
@@ -159,8 +151,12 @@ namespace CryptographyCapstone.Pages
                         polyCoeffs.Reverse();
                     
                         // Send the coefficients to be decoded
-                        plainText += Lib.PolynomialCipher.DecodePolynomial(polyCoeffs, Int32.Parse(rawKey)) + "\r\n";
+                        plainText += PolynomialCipher.DecodePolynomial(polyCoeffs, Int32.Parse(rawKey)) + "\r\n";
                     }
+                    break;
+
+                case Cryptoanalyzer.EncryptionMethods.Multiplicative:
+                    plainText = Cryptoanalyzer.DecryptMultiplicativeCipher(cipherText, Int32.Parse(rawKey));
                     break;
             }
             OutputBox.Text = plainText;

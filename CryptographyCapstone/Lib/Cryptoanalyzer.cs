@@ -9,6 +9,11 @@ namespace CryptographyCapstone.Lib
 {
     public static class Cryptoanalyzer
     {
+        public enum EncryptionMethods
+        {
+            Shift, Substitution, Polyalphabetic, Vigenere, OneTimePad, Affine, Multiplicative, Polynomial
+        }
+
         #region Shift Cipher
         public static string EncryptShiftCipher(string plainText, int key)
         {
@@ -50,6 +55,7 @@ namespace CryptographyCapstone.Lib
         }
         #endregion
 
+        #region Simple Substitution Cipher
         public static string EncryptSubstitutionCipher(string plainText, Dictionary<string, string> key)
         {
             string cipherText = "";
@@ -69,6 +75,7 @@ namespace CryptographyCapstone.Lib
         {
             return EncryptSubstitutionCipher(cipherText, Common.SwapColumns(key));
         }
+        #endregion
 
         public static string EncryptPolyalphabeticSubstitutionCipher(string plainText, Dictionary<string, List<string>> key)
         {
@@ -140,7 +147,7 @@ namespace CryptographyCapstone.Lib
         #endregion
 
         #region Affine Cipher
-        public static string EncryptAffine(string plainText, int a, int b)
+        public static string EncryptAffineCipher(string plainText, int a, int b)
         {
             string cipherText = "";
             
@@ -154,7 +161,7 @@ namespace CryptographyCapstone.Lib
             return cipherText;
         }
         
-        public static string DecryptAffine(string cipherText, int a, int b)
+        public static string DecryptAffineCipher(string cipherText, int a, int b)
         {
             string plainText = "";
  
@@ -170,6 +177,42 @@ namespace CryptographyCapstone.Lib
                 int x = Convert.ToInt32(c - 65);
                 if (x - b < 0) x = Convert.ToInt32(x) + 26;
                 plainText += Convert.ToChar(((aInverse * (x - b)) % 26) + 65);
+            }
+ 
+            return plainText;
+        }
+        #endregion
+
+        #region Multiplicative Cipher
+        public static string EncryptMultiplicativeCipher(string plainText, int key)
+        {
+            string cipherText = "";
+            
+            // Compute e(x) = (ax + b)(mod m) for every character in the Plain Text
+            foreach (char c in plainText)
+            {
+                int x = Common.CharToAlphabetIndex(c);
+                cipherText += Common.AlphabetIndexToChar(key * x);
+            }
+ 
+            return cipherText;
+        }
+        
+        public static string DecryptMultiplicativeCipher(string cipherText, int key)
+        {
+            string plainText = "";
+ 
+            // Get Multiplicative Inverse of a
+            int aInverse = Common.MultiplicativeInverse(key, 26);
+ 
+            // Put Cipher Text (all capitals) into Character Array
+            char[] chars = cipherText.ToUpper().ToCharArray();
+ 
+            // Computer d(x) = aInverse * (e(x)  b)(mod m)
+            foreach (char c in chars)
+            {
+                int x = Convert.ToInt32(c - 65);
+                plainText += Convert.ToChar(((aInverse * x) % 26) + 65);
             }
  
             return plainText;
