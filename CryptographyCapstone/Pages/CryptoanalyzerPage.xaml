@@ -6,37 +6,68 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Pivot Title="Cryptoanalyzer">
+    <Pivot>
         <PivotItem Header="Letter Frequency">
-            <Grid Margin="0,5,0,5">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <winui:NumberBox x:Name="KeyBox" Value="3"/>
-                    <TextBox x:Name="InputBox" PlaceholderText="Plaintext" AcceptsReturn="True" FontSize="20" Margin="0,5,0,0"/>
-                    <Grid Margin="0,10,0,0">
+                <TextBox x:Name="LetterFreqInputBox" Grid.Row="0" PlaceholderText="Cipher text" AcceptsReturn="True" TextWrapping="Wrap" FontSize="20" Margin="0,5,0,42"/>
+                <Button x:Name="LetterFreqAnalyzeButton" Grid.Row="0" VerticalAlignment="Bottom" Content="Analyze" Click="LetterFreqAnalyzeButton_Click" HorizontalAlignment="Center" Margin="0,0,0,5" />
+
+                <ScrollViewer Grid.Row="1" Margin="0,5,0,0">
+                    <ListView x:Name="LetterFreqOutputBox" SelectionMode="None" FontSize="20"/>
+                </ScrollViewer>
+            </Grid>
+        </PivotItem>
+
+        <PivotItem Header="Encrypt/Decrypt">
+            <SplitView Margin="0,0,-10,0" x:Name="InputView" PanePlacement="Right" DisplayMode="Inline" PaneBackground="{ThemeResource SystemControlChromeLowAcrylicWindowBrush}">
+                <Grid Margin="0,0,10,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox x:Name="InputBox" PlaceholderText="Plaintext" AcceptsReturn="True" TextWrapping="Wrap" FontSize="20" Margin="0,5,0,39"/>
+
+                    <Grid VerticalAlignment="Bottom" Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="DecryptButton" Content="Decrypt" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,5,0" Click="DecryptButton_Click"/>
-                        <Button x:Name="EncryptButton" Content="Encrypt" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,0,0" Click="EncryptButton_Click"/>
-                    </Grid>
-                </StackPanel>
+                        <Button x:Name="DecryptButton" Content="Decrypt" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,5,0" Click="DecryptButton_Click" VerticalAlignment="Bottom"/>
+                        <Button x:Name="EncryptButton" Content="Encrypt" Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,0,0" Click="EncryptButton_Click" VerticalAlignment="Bottom"/>
 
-                <ScrollViewer Grid.Row="1" Margin="10,10,10,10">
-                    <TextBox x:Name="PolynomialOutputBox" TextWrapping="Wrap" PlaceholderText="Output" IsReadOnly="True" FontSize="20"/>
-                </ScrollViewer>
-            </Grid>
+                        <ToggleButton x:Name="EncryptionSettingsButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="EncryptionSettingsButton_OnClick">
+                            <SymbolIcon Symbol="Setting"/>
+                        </ToggleButton>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,7,0,0" >
+                        <TextBox x:Name="OutputBox" TextWrapping="Wrap" PlaceholderText="Output" IsReadOnly="True" FontSize="20"/>
+                    </ScrollViewer>
+                </Grid>
+
+                <SplitView.Pane>
+                    <StackPanel Padding="10, 10, 10, 10" Spacing="5">
+                        <TextBlock Text="Settings" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
+                        <ComboBox x:Name="EncryptionMethodBox" HorizontalAlignment="Stretch" Header="Encryption Method" />
+                        <TextBox PlaceholderText="Key" x:Name="KeyBox" Header="Key" Text="2"/>
+                        
+                    </StackPanel>
+                </SplitView.Pane>
+            </SplitView>
+            
         </PivotItem>
-        
+
     </Pivot>
-    
+
 </Page>

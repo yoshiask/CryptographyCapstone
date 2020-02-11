@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.StartScreen;
-using Extreme.Mathematics;
 
 namespace CryptographyCapstone.Lib
 {
@@ -12,12 +8,12 @@ namespace CryptographyCapstone.Lib
     {
         public static int CharToAlphabetIndex(char ch)
         {
-            return char.ToUpper(ch) - 65;
+            return Modulo(char.ToUpper(ch) - 65, 26);
         }
 
         public static char AlphabetIndexToChar(int i)
         {
-            return (char)(i + 65);
+            return (char)(Modulo(i, 26) + 65);
         }
 
         public static string IntToPower(int num)
@@ -105,6 +101,11 @@ namespace CryptographyCapstone.Lib
             return a;
         }
 
+        public static int LCM(int a, int b)
+        {
+            return (a * b) / GCD(a, b);
+        }
+
         public static int FindCoprime(int num, int start)
         {
             for (int i = start; i < num; i++)
@@ -134,10 +135,15 @@ namespace CryptographyCapstone.Lib
             return total;
         }
 
-        public const double KAPPA_R_ENGLISH = 1.0 / 26;
+        public static int Modulo(int a, int m)
+        {
+            int r = a % m;
+            return (r < 0) ? r + m : r;
+        }
+
         public static double IndexOfCoincidence(int length, List<int> freq)
         {
-            double sum = Sum(1, freq.Count,
+            double sum = Sum(0, freq.Count - 1,
                 (i) => freq[i] * (freq[i] - 1)
             );
             double combinations = (double)length * (length - 1) / freq.Count;
@@ -147,23 +153,69 @@ namespace CryptographyCapstone.Lib
         {
             return IndexOfCoincidence(text.Length, GetFrequencies(text).Values.ToList());
         }
+        public const double IC_TELEGRAPHIC_ENGLISH = 1.73;
 
-        public static Dictionary<char, int> GetFrequencies(string cipherText)
+        public static Dictionary<char, int> GetFrequencies(string cipherText, bool order = false, bool ignoreCase = false)
         {
             var freq = new Dictionary<char, int>();
             foreach (char ch in cipherText)
             {
-                if (freq.ContainsKey(ch))
+                char actualCh = ignoreCase ? ch.ToString().ToUpper()[0] : ch;
+                if (freq.ContainsKey(actualCh))
                 {
-                    freq[ch]++;
+                    freq[actualCh]++;
                 }
                 else
                 {
-                    freq.Add(ch, 1);
+                    freq.Add(actualCh, 1);
                 }
             }
 
-            return freq;
+            if (order)
+            {
+                return freq.OrderBy(pair => pair.Value).ToDictionary(x => x.Key, x => x.Value);
+            }
+            else
+            {
+                return freq;
+            }
+        }
+
+        public static string RepeatString(string input, int targetLength)
+        {
+            if (targetLength < input.Length)
+                throw new ArgumentException("Target length cannot be shorter than the length of the text");
+
+            string output = "";
+            for (int i = 0; i < targetLength; i++)
+            {
+                output += input[i % input.Length];
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns the multiplicative inverse of an integer a mod n
+        /// </summary>
+        public static int MultiplicativeInverse(int a, int n)
+        {
+            for (int x = 1; x < n + 1; x++)
+            {
+                if (Modulo(a * x, n) == 1)
+                    return x;
+            }
+ 
+            throw new ArgumentException("No multiplicative inverse found");
+        }
+
+        public static Dictionary<T2, T1> SwapColumns<T1, T2>(Dictionary<T1, T2> input)
+        {
+            var output = new Dictionary<T2, T1>();
+            foreach (KeyValuePair<T1, T2> pair in input)
+            {
+                output.Add(pair.Value, pair.Key);
+            }
+            return output;
         }
     }
 
