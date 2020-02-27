@@ -60,8 +60,47 @@
                     <StackPanel Padding="10, 10, 10, 10" Spacing="5">
                         <TextBlock Text="Settings" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
                         <ComboBox x:Name="EncryptionMethodBox" HorizontalAlignment="Stretch" Header="Encryption Method" />
-                        <TextBox PlaceholderText="Key" x:Name="KeyBox" Header="Key" Text="2"/>
+                        <TextBox PlaceholderText="Key" x:Name="KeyBox" Header="Key" Text="2" AcceptsReturn="True"/>
                         
+                    </StackPanel>
+                </SplitView.Pane>
+            </SplitView>
+            
+        </PivotItem>
+
+        <PivotItem Header="Break">
+            <SplitView Margin="0,0,-10,0" x:Name="GuessInputView" PanePlacement="Right" DisplayMode="Inline" PaneBackground="{ThemeResource SystemControlChromeLowAcrylicWindowBrush}">
+                <Grid Margin="0,0,10,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox x:Name="CiphertextInputBox" PlaceholderText="Ciphertext" AcceptsReturn="True" TextWrapping="Wrap" FontSize="20" Margin="0,5,0,39"/>
+
+                    <Grid VerticalAlignment="Bottom" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="GuessButton" Content="Decrypt" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,5,0" Click="GuessButton_Click" VerticalAlignment="Bottom"/>
+
+                        <ToggleButton x:Name="GuessSettingsButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="GuessSettingsButton_OnClick">
+                            <SymbolIcon Symbol="Setting"/>
+                        </ToggleButton>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Margin="0,7,0,0">
+                        <ListView x:Name="GuessOutputBox" SelectionMode="Single" FontSize="20" SelectionChanged="GuessOutputBox_OnSelectionChanged"/>
+                    </ScrollViewer>
+                </Grid>
+
+                <SplitView.Pane>
+                    <StackPanel Padding="10, 10, 10, 10" Spacing="5">
+                        <TextBlock Text="Settings" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
+                        <ComboBox x:Name="GuessEncryptionMethodBox" HorizontalAlignment="Stretch" Header="Encryption Method" />
+                        <TextBox x:Load="False" PlaceholderText="Key" x:Name="GuessKeyBox" Header="Key" Text="2"/>
                     </StackPanel>
                 </SplitView.Pane>
             </SplitView>

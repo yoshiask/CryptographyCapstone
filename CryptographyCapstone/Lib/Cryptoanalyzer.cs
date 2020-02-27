@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Extreme.Mathematics;
 using Extreme.Mathematics.Curves;
 
 namespace CryptographyCapstone.Lib
@@ -11,7 +13,7 @@ namespace CryptographyCapstone.Lib
     {
         public enum EncryptionMethods
         {
-            Shift, Substitution, Polyalphabetic, Vigenere, OneTimePad, Affine, Multiplicative, Polynomial
+            Shift, Substitution, Polyalphabetic, Vigenere, Bifid, Atbash, MorseCode, Ascii, OneTimePad, Affine, Multiplicative, Polynomial, PolynomialBlock
         }
 
         #region Shift Cipher
@@ -36,20 +38,21 @@ namespace CryptographyCapstone.Lib
             return EncryptShiftCipher(cipherText, -key);
         }
 
-        public static List<int> GuessShiftCipher(string cipherText)
+        public static Dictionary<int, string> GuessShiftCipher(string cipherText)
         {
-            Dictionary<int, double> ICList = new Dictionary<int, double>();
+            var ICList = new Dictionary<Tuple<int, string>, double>();
             for (int i = 1; i <= 26; i++)
             {
-                ICList.Add(i, Common.IndexOfCoincidence(
-                    DecryptShiftCipher(cipherText, i)
-                ));
+                string plainTextGuess = DecryptShiftCipher(cipherText, i);
+                ICList.Add(new Tuple<int, string>(i, plainTextGuess),
+                    Common.IndexOfCoincidence(plainTextGuess)
+                );
             }
 
-            var guessedKeys = new List<int>();
-            foreach (var ic in ICList.OrderByDescending((d => 1 - d.Value)))
+            var guessedKeys = new Dictionary<int, string>();
+            foreach (var ic in ICList.OrderByDescending(d => Math.Abs(Common.IC_TELEGRAPHIC_ENGLISH - d.Value)))
             {
-                guessedKeys.Add(ic.Key);
+                guessedKeys.Add(ic.Key.Item1, ic.Key.Item2);
             }
             return guessedKeys;
         }
@@ -62,8 +65,8 @@ namespace CryptographyCapstone.Lib
 
             foreach (var ch in plainText)
             {
-                if (key.ContainsKey(ch.ToString()))
-                    cipherText += key[ch.ToString()];
+                if (key.ContainsKey(ch.ToString().ToUpper()))
+                    cipherText += key[ch.ToString().ToUpper()];
                 else
                     cipherText += ch;
             }
@@ -97,6 +100,8 @@ namespace CryptographyCapstone.Lib
 
         public static string EncryptVigenereCipher(string plainText, int key)
         {
+            // TODO: This is wrong, fix it
+            // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
             string cipherText = "";
             foreach (char ch in plainText)
             {
@@ -154,8 +159,15 @@ namespace CryptographyCapstone.Lib
             // Compute e(x) = (ax + b)(mod m) for every character in the Plain Text
             foreach (char c in plainText)
             {
-                int x = Common.CharToAlphabetIndex(c);
-                cipherText += Common.AlphabetIndexToChar(a * x + b);
+                if (Char.IsLetter(c))
+                {
+                    int x = Common.CharToAlphabetIndex(c);
+                    cipherText += Common.AlphabetIndexToChar(a * x + b);
+                }
+                else
+                {
+                    cipherText += c;
+                }
             }
  
             return cipherText;
@@ -174,13 +186,51 @@ namespace CryptographyCapstone.Lib
             // Computer d(x) = aInverse * (e(x)  b)(mod m)
             foreach (char c in chars)
             {
-                int x = Convert.ToInt32(c - 65);
-                if (x - b < 0) x = Convert.ToInt32(x) + 26;
-                plainText += Convert.ToChar(((aInverse * (x - b)) % 26) + 65);
+                if (Char.IsLetter(c))
+                {
+                    int x = Common.CharToAlphabetIndex(c);
+                    plainText += Common.AlphabetIndexToChar(aInverse * (x - b));
+                }
+                else
+                {
+                    plainText += c;
+                }
             }
  
             return plainText;
         }
+
+        public static Dictionary<Tuple<int, int>, string> GuessAffineCipher(string cipherText)
+        {
+            Debug.WriteLine("Affine brute-force started: " + DateTime.Now);
+            var ICList = new Dictionary<Tuple<int, int, string>, double>();
+            for (int i = 1; i <= 26; i++)
+            {
+                for (int j = 1; j <= 26; j++)
+                {
+                    try
+                    {
+                        string plainTextGuess = DecryptAffineCipher(cipherText, i, j);
+                        ICList.Add(new Tuple<int, int, string>(i, j, plainTextGuess),
+                            Common.IndexOfCoincidence(plainTextGuess)
+                        );
+                    }
+                    catch (ArgumentException)
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            var guessedKeys = new Dictionary<Tuple<int, int>, string>();
+            foreach (var ic in ICList.OrderByDescending((d => 1 - d.Value)))
+            {
+                guessedKeys.Add(new Tuple<int, int>(ic.Key.Item1, ic.Key.Item2), ic.Key.Item3);
+            }
+            Debug.WriteLine("Affine brute-force completed: " + DateTime.Now);
+            return guessedKeys;
+        }
+
         #endregion
 
         #region Multiplicative Cipher
@@ -188,11 +238,18 @@ namespace CryptographyCapstone.Lib
         {
             string cipherText = "";
             
-            // Compute e(x) = (ax + b)(mod m) for every character in the Plain Text
+            // Compute e(x) = (ax)(mod m) for every character in the Plain Text
             foreach (char c in plainText)
             {
-                int x = Common.CharToAlphabetIndex(c);
-                cipherText += Common.AlphabetIndexToChar(key * x);
+                if (Char.IsLetter(c))
+                {
+                    int x = Common.CharToAlphabetIndex(c);
+                    cipherText += Common.AlphabetIndexToChar(key * x);
+                }
+                else
+                {
+                    cipherText += c;
+                }
             }
  
             return cipherText;
@@ -208,14 +265,334 @@ namespace CryptographyCapstone.Lib
             // Put Cipher Text (all capitals) into Character Array
             char[] chars = cipherText.ToUpper().ToCharArray();
  
-            // Computer d(x) = aInverse * (e(x)  b)(mod m)
+            // Compute d(x) = aInverse * e(x)(mod m)
             foreach (char c in chars)
             {
-                int x = Convert.ToInt32(c - 65);
-                plainText += Convert.ToChar(((aInverse * x) % 26) + 65);
+                if (Char.IsLetter(c))
+                {
+                    int x = Common.CharToAlphabetIndex(c);
+                    plainText += Common.AlphabetIndexToChar(aInverse * x);
+                }
+                else
+                {
+                    plainText += c;
+                }
             }
  
             return plainText;
+        }
+
+        public static Dictionary<int, string> GuessMultiplicativeCipher(string cipherText)
+        {
+            var ICList = new Dictionary<Tuple<int, string>, double>();
+            Parallel.For(1, 27, i =>
+            {
+                try
+                {
+                    string plainTextGuess = DecryptMultiplicativeCipher(cipherText, i);
+                    ICList.Add(new Tuple<int, string>(i, plainTextGuess),
+                        Common.IndexOfCoincidence(plainTextGuess)
+                    );
+                }
+                catch (ArgumentException)
+                {
+                }
+            });
+
+            var guessedKeys = new Dictionary<int, string>();
+            foreach (var ic in ICList.OrderByDescending((d => 1 - d.Value)))
+            {
+                guessedKeys.Add(ic.Key.Item1, ic.Key.Item2);
+            }
+            return guessedKeys;
+        }
+        #endregion
+
+        #region Polynomial Block Cipher
+        public static string EncryptPolynomialBlockCipher(string plainText, int key, int blockSize = 2)
+        {
+            string cipherText = "";
+
+            // Even keys prevent the characters from being decrypted in the proper order
+            if (key.IsEven()) key++;
+
+            foreach (var raw in Common.SplitIntoNGrams(plainText, blockSize))
+            {
+                string ngram = raw.Replace(" ", "Z").Replace("-", "X").Replace(".", "Q");
+                cipherText += PolynomialCipher.CoeffsToPolynomial(PolynomialCipher.EncryptString(ngram, key)) + "\r\n";
+            }
+
+            return cipherText;
+        }
+
+        public static string DecryptPolynomialBlockCipher(List<List<double>> coeffs, int key, int blockSize = 2)
+        {
+            string plainText = "";
+            if (key.IsEven()) key++;
+
+            foreach (var coeff in coeffs)
+            {
+                string cipherPart = PolynomialCipher.DecodePolynomial(coeff, key);
+                plainText += cipherPart.Replace("Z", " ").Replace("X", "-").Replace("Q", ".");
+                plainText += " ";
+            }
+            return plainText;
+        }
+        #endregion
+
+        #region Bifid Cipher
+        public static string EncryptBifidCipher(string pT, string key)
+        {
+            string plainText = Common.PrepForCipher(pT);
+            string cipherText = "";
+            var tableauChar = new Table<char>(5, 5, '\0');
+
+            // Generate the tableau
+            int currentDefaultKey = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    // i is row, j is column
+                    int singleIndex = (j * 5) + i;
+                    if (singleIndex >= key.Length)
+                    {
+                        char defaultKeyChar = Common.AlphabetIndexToChar(currentDefaultKey);
+                        if (!tableauChar.IsInTable(defaultKeyChar) && defaultKeyChar != 'Q')
+                        {
+                            tableauChar[i, j] = defaultKeyChar;
+                        }
+                        currentDefaultKey++;
+                    }
+                    else
+                    {
+                        char keyChar = key[singleIndex];
+                        if (!tableauChar.IsInTable(keyChar))
+                        {
+                            tableauChar[i, j] = keyChar;
+                        }
+                    }
+
+                    Debug.Write(tableauChar[i, j] + " ");
+                }
+                Debug.WriteLine("");
+            }
+
+            foreach (char ch in plainText)
+            {
+                
+            }
+            return cipherText;
+        }
+        #endregion
+
+        #region Atbash Cipher
+        private static Dictionary<string, string> AtbashKey = new Dictionary<string, string>()
+        {
+            { "A", "Z" },
+            { "B", "Y" },
+            { "C", "X" },
+            { "D", "W" },
+            { "E", "V" },
+            { "F", "U" },
+            { "G", "T" },
+            { "H", "S" },
+            { "I", "R" },
+            { "J", "Q" },
+            { "K", "P" },
+            { "L", "O" },
+            { "M", "N" },
+            { "N", "M" },
+            { "O", "L" },
+            { "P", "K" },
+            { "Q", "J" },
+            { "R", "I" },
+            { "S", "H" },
+            { "T", "G" },
+            { "U", "F" },
+            { "V", "E" },
+            { "W", "D" },
+            { "X", "C" },
+            { "Y", "B" },
+            { "Z", "A" },
+        };
+        public static string EncryptAtbashCipher(string plainText)
+        {
+            return EncryptSubstitutionCipher(plainText, AtbashKey);
+        }
+
+        public static string DecryptAtbashCipher(string cipherText)
+        {
+            return EncryptAtbashCipher(cipherText);
+        }
+        #endregion
+
+        #region Morse Code
+        private static Dictionary<string, string> MorseCodeKey = new Dictionary<string, string>()
+        {
+            { "A", ".-" },
+            { "B", "-..." },
+            { "C", "-.-." },
+            { "D", "-.." },
+            { "E", "." },
+            { "F", "..-." },
+            { "G", "--." },
+            { "H", "...." },
+            { "I", ".." },
+            { "J", ".---" },
+            { "K", "-.-" },
+            { "L", ".-.." },
+            { "M", "--" },
+            { "N", "-." },
+            { "O", "---" },
+            { "P", ".--." },
+            { "Q", "--.-" },
+            { "R", ".-." },
+            { "S", "..." },
+            { "T", "-" },
+            { "U", "..-" },
+            { "V", "...-" },
+            { "W", ".--" },
+            { "X", "-..-" },
+            { "Y", "-.--" },
+            { "Z", "--.." },
+            { "1", ".----" },
+            { "2", "..---" },
+            { "3", "...--" },
+            { "4", "....-" },
+            { "5", "....." },
+            { "6", "-...." },
+            { "7", "--..." },
+            { "8", "---.." },
+            { "9", "----." },
+            { "0", "-----" },
+        };
+        
+        public static string EncryptMorseCode(string plainText)
+        {
+            return EncryptMorseCode(plainText, ".", "-", " ");
+        }
+        public static string EncryptMorseCode(string plainText, string dot, string dash, string space)
+        {
+            string cipherText = "";
+            var key = GenerateMorseCodeKey(dot, dash);
+
+            foreach (var word in Common.SplitWords(plainText))
+            {
+                foreach (var ch in word)
+                {
+                    if (key.ContainsKey(ch.ToString().ToUpper()))
+                        cipherText += key[ch.ToString().ToUpper()];
+                    else
+                        cipherText += ch;
+                    cipherText += " ";
+                }
+                cipherText += space;
+            }
+
+            return cipherText;
+        }
+
+        public static string DecryptMorseCode(string cipherText)
+        {
+            return DecryptMorseCode(cipherText, ".", "-", " ");
+        }
+        public static string DecryptMorseCode(string cipherText, string dot, string dash, string space)
+        {
+            string plainText = "";
+            var key = Common.SwapColumns(GenerateMorseCodeKey(dot, dash));
+
+            foreach (var letter in cipherText.Split(space))
+            {
+                if (key.ContainsKey(letter))
+                    plainText += key[letter];
+                else
+                    plainText += letter;
+            }
+
+            return plainText;
+        }
+
+        private static Dictionary<string, string> GenerateMorseCodeKey(string dot, string dash)
+        {
+            var key = new Dictionary<string, string>();
+            foreach (var pair in MorseCodeKey)
+            {
+                key[pair.Key] = pair.Value.Replace(".", dot).Replace("-", dash);
+            }
+            return key;
+        }
+        #endregion
+
+        #region Index Encoding
+        public static string EncryptIndexEncoding(string plainText)
+        {
+            string output = "";
+            foreach (char ch in plainText)
+            {
+                if (Char.IsLetter(ch))
+                    output += Common.CharToAlphabetIndex(ch) + " ";
+                else
+                    output += ch;
+            }
+            return output;
+        }
+
+        public static string DecryptIndexEncoding(string cipherText)
+        {
+            string output = "";
+            foreach (char ch in cipherText)
+            {
+                if (Char.IsDigit(ch))
+                    output += Common.AlphabetIndexToChar(Int32.Parse(ch.ToString())) + " ";
+                else
+                    output += ch;
+            }
+            return output;
+        }
+        #endregion
+
+        #region ASCII Encoding
+        public static string EncryptAsciiEncoding(string plainText)
+        {
+            return Common.ToBinary(Common.ConvertToByteArray(plainText, Encoding.ASCII));
+        }
+
+        public static string DecryptAsciiEncoding(string cipherText)
+        {
+            List<byte> bytes = new List<byte>();
+            foreach (string byteString in Common.SplitWords(cipherText))
+            {
+                bytes.Add(Convert.ToByte(byteString, 2));
+            }
+            return Encoding.ASCII.GetString(bytes.ToArray());
+        }
+        #endregion
+
+        #region Cryptanalysis
+        public static async Task<IDictionary<string, double>> RankCandidatePlaintext(IEnumerable<string> guesses)
+        {
+            var unsortedList = new Dictionary<string, double>();
+            foreach (string guess in guesses)
+            {
+                unsortedList.Add(guess, await RankCandidatePlaintext(guess));
+            }
+            return unsortedList.OrderByDescending(pair => pair.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public static async Task<double> RankCandidatePlaintext(string guess)
+        {
+            // Set up the dictionary we're going to use
+            await Common.InitEnglishDict();
+
+            int realWordCount = 0;
+            var words = Common.SplitWords(guess);
+            foreach (var word in words)
+            {
+                if (await Common.IsEnglishWord(word))
+                    realWordCount++;
+            }
+            return (double)realWordCount / words.Length;
         }
         #endregion
     }
@@ -247,13 +624,8 @@ namespace CryptographyCapstone.Lib
         public static List<string> EncodeMessage(string message, int key)
         {
             var output = new List<string>();
-            // Split the message into words
-            var words = message.Split(
-                new char[] { ' ', ',', '.', '!', '?' },
-                StringSplitOptions.RemoveEmptyEntries);
-
             // Encode each word
-            foreach (string word in words)
+            foreach (string word in Common.SplitWords(message))
             {
                 output.Add(CoeffsToPolynomial(EncryptString(word, key)));
             }
@@ -285,13 +657,17 @@ namespace CryptographyCapstone.Lib
             // and the value of *a* where x-a=0 is the character itself.
             var roots = new List<double>();
             int[] lastCoprime = new int[26];
+            for (int i = 0; i < lastCoprime.Length; i++)
+            {
+                lastCoprime[i] = 1;
+            }
             for (int i = 0; i < plaintext.Count; i++)
             {
                 int currentChar = plaintext[i];
                 // First, determine which appearance of the character this is
-                int coprime = Lib.Common.FindCoprime(currentChar + key, lastCoprime[currentChar]);
+                int coprime = Common.FindCoprime(currentChar + key, lastCoprime[currentChar]);
                 double root = (double)(currentChar + key) / coprime;
-                lastCoprime[currentChar] = coprime;
+                lastCoprime[currentChar] = coprime+1;
 
                 // Finally, make it a multiplicity
                 for (int k = 0; k < i + 1; k++)

@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.AI.MachineLearning;
+using Windows.Storage;
 
 namespace CryptographyCapstone.Lib
 {
@@ -14,6 +19,39 @@ namespace CryptographyCapstone.Lib
         public static char AlphabetIndexToChar(int i)
         {
             return (char)(Modulo(i, 26) + 65);
+        }
+
+        public static byte[] ConvertToByteArray(string str, System.Text.Encoding encoding)
+        {
+            return encoding.GetBytes(str);
+        }
+
+        public static String ToBinary(Byte[] data, int padding)
+        {
+            return string.Join(" ", data.Select(byt => Convert.ToString(byt, 2).PadLeft(padding, '0')));
+        }
+        public static String ToBinary(Byte[] data)
+        {
+            return ToBinary(data, 8);
+        }
+
+        public static byte[] ToByte(string byteString)
+        {
+            var numOfBytes = (int)Math.Ceiling(byteString.Length / 8m);
+            var bytes = new byte[numOfBytes];
+            var chunkSize = 8;
+
+            for (int i = 1; i <= numOfBytes; i++)
+            {
+                var startIndex = byteString.Length - 8 * i;
+                if (startIndex < 0)
+                {
+                    chunkSize = 8 + startIndex;
+                    startIndex = 0;
+                }
+                bytes[numOfBytes - i] = Convert.ToByte(byteString.Substring(startIndex, chunkSize), 2);
+            }
+            return bytes;
         }
 
         public static string IntToPower(int num)
@@ -92,13 +130,15 @@ namespace CryptographyCapstone.Lib
 
         public static int GCD(int a, int b)
         {
-            int t;
-            while (b != 0)
+            while (a != 0 && b != 0)
             {
-                a = b;
-                b = a % b;
+                if (a > b)
+                    a %= b;
+                else
+                    b %= a;
             }
-            return a;
+
+            return a == 0 ? b : a;
         }
 
         public static int LCM(int a, int b)
@@ -216,6 +256,54 @@ namespace CryptographyCapstone.Lib
                 output.Add(pair.Value, pair.Key);
             }
             return output;
+        }
+
+        public static IEnumerable<string> SplitIntoNGrams(string input, int n)
+        {
+            return Enumerable.Range(0, input.Length / n)
+                .Select(i => input.Substring(i * n, n));
+        }
+
+        public static string PrepForCipher(string text)
+        {
+            string output = "";
+            foreach (char ch in text)
+                if (Char.IsLetter(ch)) output += Char.ToUpper(ch);
+            return output;
+        }
+
+        public static string[] SplitWords(string text)
+        {
+            return text.Split(
+                new char[] { ' ', ',', '.', '!', '?' },
+                StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private static List<string> EnglishDict;
+        public static async Task InitEnglishDict()
+        {
+            if (EnglishDict != null)
+                return;
+
+            EnglishDict = new List<string>();
+            StorageFolder installationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            StorageFile file = await installationFolder.GetFileAsync("Assets\\words_alpha.txt");
+            if(File.Exists(file.Path))
+            {
+                foreach (string word in File.ReadAllLines(file.Path))
+                {
+                    EnglishDict.Add(word.ToUpper());
+                }
+            }
+        }
+        public static async Task<bool> IsEnglishWord(string word)
+        {
+            if (EnglishDict == null)
+            {
+                await InitEnglishDict();
+            }
+
+            return EnglishDict.Contains(word);
         }
     }
 
