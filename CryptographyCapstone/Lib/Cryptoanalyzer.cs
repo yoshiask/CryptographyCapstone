@@ -188,7 +188,7 @@ namespace CryptographyCapstone.Lib
             // Computer d(x) = aInverse * (e(x)  b)(mod m)
             foreach (char c in chars)
             {
-                if (Char.IsLetter(c))
+                if (char.IsLetter(c))
                 {
                     int x = Common.CharToAlphabetIndex(c);
                     plainText += Common.AlphabetIndexToChar(aInverse * (x - b));
@@ -242,7 +242,7 @@ namespace CryptographyCapstone.Lib
             // Compute e(x) = (ax)(mod m) for every character in the Plain Text
             foreach (char c in plainText)
             {
-                if (Char.IsLetter(c))
+                if (char.IsLetter(c))
                 {
                     int x = Common.CharToAlphabetIndex(c);
                     cipherText += Common.AlphabetIndexToChar(key * x);
@@ -269,7 +269,7 @@ namespace CryptographyCapstone.Lib
             // Compute d(x) = aInverse * e(x)(mod m)
             foreach (char c in chars)
             {
-                if (Char.IsLetter(c))
+                if (char.IsLetter(c))
                 {
                     int x = Common.CharToAlphabetIndex(c);
                     plainText += Common.AlphabetIndexToChar(aInverse * x);
@@ -335,7 +335,6 @@ namespace CryptographyCapstone.Lib
             {
                 string cipherPart = PolynomialCipher.DecodePolynomial(coeff, key);
                 plainText += cipherPart.Replace("Z", " ").Replace("X", "-").Replace("Q", ".");
-                //plainText += " ";
             }
             return plainText;
         }
@@ -531,7 +530,7 @@ namespace CryptographyCapstone.Lib
             string output = "";
             foreach (char ch in plainText)
             {
-                if (Char.IsLetter(ch))
+                if (char.IsLetter(ch))
                     output += Common.CharToAlphabetIndex(ch) + " ";
                 else
                     output += ch;
@@ -544,8 +543,8 @@ namespace CryptographyCapstone.Lib
             string output = "";
             foreach (char ch in cipherText)
             {
-                if (Char.IsDigit(ch))
-                    output += Common.AlphabetIndexToChar(Int32.Parse(ch.ToString())) + " ";
+                if (char.IsDigit(ch))
+                    output += Common.AlphabetIndexToChar(int.Parse(ch.ToString())) + " ";
                 else
                     output += ch;
             }
@@ -606,17 +605,15 @@ namespace CryptographyCapstone.Lib
 
             for (int i = coeffs.Count - 1; i >= 0; i--)
             {
-                if (coeffs[i] != 1.0)
+                if (Math.Abs(coeffs[i] - 1.0) > 0.00001)
                     output += Math.Abs(coeffs[i]);
 
-                if (i != 0)
-                {
-                    output += "x" + Lib.Common.IntToPower(i);
-                    if (coeffs[i-1] >= 0)
-                        output += " + ";
-                    else
-                        output += " - ";
-                }
+                if (i == 0) continue;
+                output += "x" + Common.IntToPower(i);
+                if (coeffs[i-1] >= 0)
+                    output += " + ";
+                else
+                    output += " - ";
             }
 
             return output;
@@ -661,7 +658,7 @@ namespace CryptographyCapstone.Lib
             // Convert the message to non-zero indexed list
             foreach (char ch in message)
             {
-                int c = Lib.Common.CharToAlphabetIndex(ch) + 1;
+                int c = Common.CharToAlphabetIndex(ch) + 1;
                 if (c >= 0 && c < 65)
                     plaintext.Add(c);
             }
@@ -716,24 +713,22 @@ namespace CryptographyCapstone.Lib
         /// <param name="coeffs">A list of the coefficients, with the least significant first</param>
         public static string DecodePolynomial(List<double> coeffs, int key)
         {
-            string output = "";
-
             var polynomial = new Polynomial(coeffs);
             var roots = polynomial.FindRoots();
             var decodedChars = new Dictionary<double, Tuple<int, char>>();
 
-            for (int i = 0; i < roots.Length; i++)
+            foreach (var root in roots)
             {
                 // Considering ax-b=0, where a and b are the same value,
                 // the roots listed are only x. We need a*x, so to do that
                 // we convert the decimal to a fraction and take the denominator
-                double realValue = Fraction.FromRealNumber(roots[i], 0.01).D;
+                double realValue = Fraction.FromRealNumber(root, 0.01).D;
 
                 // Shift the value back to its character by subtracting the key
                 realValue -= key;
 
                 // Track this character to determine the character's position
-                double identifier = Math.Round(roots[i], 2);
+                double identifier = Math.Round(root, 2);
                 if (decodedChars.ContainsKey(identifier))
                 {
                     decodedChars[identifier] = new Tuple<int, char>(
@@ -745,7 +740,7 @@ namespace CryptographyCapstone.Lib
                 {
                     decodedChars.Add(identifier, new Tuple<int, char>(
                         1,
-                        Lib.Common.AlphabetIndexToChar((int)Math.Round(realValue) - 1)
+                        Common.AlphabetIndexToChar((int)Math.Round(realValue) - 1)
                     ));
                 }
             }
@@ -754,12 +749,8 @@ namespace CryptographyCapstone.Lib
             // in the correct order
             var orderedPairs = decodedChars.OrderBy(
                 data => data.Value.Item1);
-            foreach (var pair in orderedPairs)
-            {
-                output += pair.Value.Item2;
-            }
 
-            return output;
+            return orderedPairs.Aggregate(string.Empty, (current, pair) => current + pair.Value.Item2);
         }
     }
 }

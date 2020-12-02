@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.AI.MachineLearning;
 using Windows.Storage;
 
 namespace CryptographyCapstone.Lib
@@ -122,7 +120,7 @@ namespace CryptographyCapstone.Lib
             while(num > 0)
             {
                 listOfInts.Add(num % 10);
-                num = num / 10;
+                num /= 10;
             }
             listOfInts.Reverse();
             return listOfInts.ToArray();
@@ -198,9 +196,8 @@ namespace CryptographyCapstone.Lib
         public static Dictionary<char, int> GetFrequencies(string cipherText, bool order = false, bool ignoreCase = false)
         {
             var freq = new Dictionary<char, int>();
-            foreach (char ch in cipherText)
+            foreach (var actualCh in cipherText.Select(ch => ignoreCase ? ch.ToString().ToUpper()[0] : ch))
             {
-                char actualCh = ignoreCase ? ch.ToString().ToUpper()[0] : ch;
                 if (freq.ContainsKey(actualCh))
                 {
                     freq[actualCh]++;
@@ -211,14 +208,9 @@ namespace CryptographyCapstone.Lib
                 }
             }
 
-            if (order)
-            {
-                return freq.OrderBy(pair => pair.Value).ToDictionary(x => x.Key, x => x.Value);
-            }
-            else
-            {
-                return freq;
-            }
+            return order
+                ? freq.OrderBy(pair => pair.Value).ToDictionary(x => x.Key, x => x.Value)
+                : freq;
         }
 
         public static string RepeatString(string input, int targetLength)
@@ -250,12 +242,7 @@ namespace CryptographyCapstone.Lib
 
         public static Dictionary<T2, T1> SwapColumns<T1, T2>(Dictionary<T1, T2> input)
         {
-            var output = new Dictionary<T2, T1>();
-            foreach (KeyValuePair<T1, T2> pair in input)
-            {
-                output.Add(pair.Value, pair.Key);
-            }
-            return output;
+            return input.ToDictionary(pair => pair.Value, pair => pair.Key);
         }
 
         public static IEnumerable<string> SplitIntoNGrams(string input, int n)
@@ -268,14 +255,14 @@ namespace CryptographyCapstone.Lib
         {
             string output = "";
             foreach (char ch in text)
-                if (Char.IsLetter(ch)) output += Char.ToUpper(ch);
+                if (char.IsLetter(ch)) output += char.ToUpper(ch);
             return output;
         }
 
         public static string[] SplitWords(string text)
         {
             return text.Split(
-                new char[] { ' ', ',', '.', '!', '?' },
+                new[] { ' ', ',', '.', '!', '?' },
                 StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -290,7 +277,7 @@ namespace CryptographyCapstone.Lib
             StorageFile file = await installationFolder.GetFileAsync("Assets\\words_alpha.txt");
             if(File.Exists(file.Path))
             {
-                foreach (string word in File.ReadAllLines(file.Path))
+                foreach (string word in await File.ReadAllLinesAsync(file.Path))
                 {
                     EnglishDict.Add(word.ToUpper());
                 }

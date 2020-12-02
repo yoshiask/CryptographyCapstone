@@ -22,8 +22,9 @@ namespace CryptographyCapstone.Pages
             this.InitializeComponent();
 
             var _enumval = Enum.GetValues(typeof(Cryptoanalyzer.EncryptionMethods)).Cast<Cryptoanalyzer.EncryptionMethods>();
-            EncryptionMethodBox.ItemsSource = _enumval.ToList();
-            GuessEncryptionMethodBox.ItemsSource = _enumval.ToList();
+            var encryptionMethods = _enumval.ToList();
+            EncryptionMethodBox.ItemsSource = encryptionMethods;
+            GuessEncryptionMethodBox.ItemsSource = encryptionMethods;
         }
 
         private void LetterFreqAnalyzeButton_Click(object sender, RoutedEventArgs e)
@@ -31,37 +32,38 @@ namespace CryptographyCapstone.Pages
             string cipherText = LetterFreqInputBox.Text;
             OutputBox.Text = "";
             LetterFreqOutputBox.Items.Clear();
-            foreach (KeyValuePair<char, int> freq in Lib.Common.GetFrequencies(cipherText, true, true).Reverse())
+            foreach (var (c, freq) in Lib.Common.GetFrequencies(cipherText, true, true).Reverse())
             {
-                string letter = freq.Key.ToString();
-                if (letter == "\n" || letter == "\r")
+                string letter = c.ToString();
+                switch (letter)
                 {
-                    letter = "↩";
-                }
-                else if (letter == " ")
-                {
-                    letter = "⎵";
-                }
-                else if (letter == "\t")
-                {
-                    letter = "↦";
+                    case "\n":
+                    case "\r":
+                        letter = "↩";
+                        break;
+                    case " ":
+                        letter = "⎵";
+                        break;
+                    case "\t":
+                        letter = "↦";
+                        break;
                 }
 
-                LetterFreqOutputBox.Items.Add(new ListViewItem()
+                LetterFreqOutputBox.Items.Add(new ListViewItem
                 {
-                    Content = new StackPanel()
+                    Content = new StackPanel
                     {
                         Orientation = Orientation.Horizontal,
                         Children =
                         {
-                            new TextBlock()
+                            new TextBlock
                             {
                                 Text = letter,
                                 FontWeight = FontWeights.Bold
                             },
-                            new TextBlock()
+                            new TextBlock
                             {
-                                Text = " : " + freq.Value.ToString()
+                                Text = " : " + freq
                             },
                         }
                     }
@@ -77,7 +79,7 @@ namespace CryptographyCapstone.Pages
             switch ((Cryptoanalyzer.EncryptionMethods)EncryptionMethodBox.SelectedIndex)
             {
                 case Cryptoanalyzer.EncryptionMethods.Shift:
-                    cipherText = Cryptoanalyzer.EncryptShiftCipher(plainText, Int32.Parse(rawKey));
+                    cipherText = Cryptoanalyzer.EncryptShiftCipher(plainText, int.Parse(rawKey));
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.OneTimePad:
@@ -87,23 +89,20 @@ namespace CryptographyCapstone.Pages
                 case Cryptoanalyzer.EncryptionMethods.Affine:
                     string[] keys = rawKey.Split(',', ';', ':', ' ');
                     cipherText = Cryptoanalyzer.EncryptAffineCipher(plainText,
-                        Int32.Parse(keys[0]), Int32.Parse(keys[1]));
+                        int.Parse(keys[0]), int.Parse(keys[1]));
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Polynomial:
-                    var polynomials = PolynomialCipher.EncodeMessage(InputBox.Text, Int32.Parse(rawKey));
-                    foreach (string output in polynomials)
-                    {
-                        cipherText += output + "\r\n";
-                    }
+                    var polynomials = PolynomialCipher.EncodeMessage(InputBox.Text, int.Parse(rawKey));
+                    cipherText = string.Join("\r\n", polynomials);
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Multiplicative:
-                    cipherText = Cryptoanalyzer.EncryptMultiplicativeCipher(plainText, Int32.Parse(rawKey));
+                    cipherText = Cryptoanalyzer.EncryptMultiplicativeCipher(plainText, int.Parse(rawKey));
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.PolynomialBlock:
-                    cipherText = Cryptoanalyzer.EncryptPolynomialBlockCipher(InputBox.Text, Int32.Parse(rawKey));
+                    cipherText = Cryptoanalyzer.EncryptPolynomialBlockCipher(InputBox.Text, int.Parse(rawKey));
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Bifid:
@@ -116,10 +115,9 @@ namespace CryptographyCapstone.Pages
 
                 case Cryptoanalyzer.EncryptionMethods.MorseCode:
                     string[] morseCodeChars = rawKey.Split(',', ';', ':', ' ');
-                    if (morseCodeChars.Length != 3)
-                        cipherText = Cryptoanalyzer.EncryptMorseCode(plainText);
-                    else
-                        cipherText = Cryptoanalyzer.EncryptMorseCode(plainText, morseCodeChars[0], morseCodeChars[1], morseCodeChars[2]);
+                    cipherText = morseCodeChars.Length != 3
+                        ? Cryptoanalyzer.EncryptMorseCode(plainText)
+                        : Cryptoanalyzer.EncryptMorseCode(plainText, morseCodeChars[0], morseCodeChars[1], morseCodeChars[2]);
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Ascii:
@@ -142,7 +140,7 @@ namespace CryptographyCapstone.Pages
             {
                 #region Shift
                 case Cryptoanalyzer.EncryptionMethods.Shift:
-                    plainText = Cryptoanalyzer.DecryptShiftCipher(cipherText, Int32.Parse(rawKey));
+                    plainText = Cryptoanalyzer.DecryptShiftCipher(cipherText, int.Parse(rawKey));
                     break;
                 #endregion
 
@@ -158,7 +156,7 @@ namespace CryptographyCapstone.Pages
                     try
                     {
                         plainText = Cryptoanalyzer.DecryptAffineCipher(cipherText,
-                            Int32.Parse(keys[0]), Int32.Parse(keys[1]));
+                            int.Parse(keys[0]), int.Parse(keys[1]));
                     }
                     catch (ArgumentException ex)
                     {
@@ -182,20 +180,20 @@ namespace CryptographyCapstone.Pages
                         List<double> polyCoeffs = new List<double>();
                         foreach (string inputCoeff in inputPoly.Split(' ', StringSplitOptions.RemoveEmptyEntries))
                         {
-                            polyCoeffs.Add(Double.Parse(inputCoeff));
+                            polyCoeffs.Add(double.Parse(inputCoeff));
                         }
 
                         polyCoeffs.Reverse();
                     
                         // Send the coefficients to be decoded
-                        plainText += PolynomialCipher.DecodePolynomial(polyCoeffs, Int32.Parse(rawKey)) + "\r\n";
+                        plainText += PolynomialCipher.DecodePolynomial(polyCoeffs, int.Parse(rawKey)) + "\r\n";
                     }
                     break;
                 #endregion
 
                 #region Multiplicative
                 case Cryptoanalyzer.EncryptionMethods.Multiplicative:
-                    plainText = Cryptoanalyzer.DecryptMultiplicativeCipher(cipherText, Int32.Parse(rawKey));
+                    plainText = Cryptoanalyzer.DecryptMultiplicativeCipher(cipherText, int.Parse(rawKey));
                     break;
                 #endregion
 
@@ -208,10 +206,9 @@ namespace CryptographyCapstone.Pages
                 #region Morse Code
                 case Cryptoanalyzer.EncryptionMethods.MorseCode:
                     string[] morseCodeChars = rawKey.Split(',', ';', ':', ' ');
-                    if (morseCodeChars.Length != 2)
-                        plainText = Cryptoanalyzer.DecryptMorseCode(cipherText);
-                    else
-                        plainText = Cryptoanalyzer.DecryptMorseCode(cipherText, morseCodeChars[0], morseCodeChars[1], morseCodeChars[2]);
+                    plainText = morseCodeChars.Length != 2
+                        ? Cryptoanalyzer.DecryptMorseCode(cipherText)
+                        : Cryptoanalyzer.DecryptMorseCode(cipherText, morseCodeChars[0], morseCodeChars[1], morseCodeChars[2]);
                     break;
                 #endregion
 
@@ -219,8 +216,8 @@ namespace CryptographyCapstone.Pages
                 case Cryptoanalyzer.EncryptionMethods.PolynomialBlock:
                     // Parse the polynomials and decode them
                     string[] blockInputPolynomials = InputBox.Text.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
-                    List<List<double>> blockCoeffs = blockInputPolynomials.Select(inputPoly => PolynomialCipher.ParsePolynomial(inputPoly)).ToList();
-                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, Int32.Parse(rawKey));
+                    List<List<double>> blockCoeffs = blockInputPolynomials.Select(PolynomialCipher.ParsePolynomial).ToList();
+                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, int.Parse(rawKey));
                     break;
                     #endregion
 
@@ -237,14 +234,14 @@ namespace CryptographyCapstone.Pages
         {
             string cipherText = CiphertextInputBox.Text;
             string plainText = "";
-            GuessOutputBox.Items.Clear();
+            GuessOutputBox.Items?.Clear();
             switch ((Cryptoanalyzer.EncryptionMethods)GuessEncryptionMethodBox.SelectedIndex)
             {
                 case Cryptoanalyzer.EncryptionMethods.Shift:
                     var guesses = Cryptoanalyzer.GuessShiftCipher(cipherText);
                     foreach (var guess in await Cryptoanalyzer.RankCandidatePlaintext(guesses.Values))
                     {
-                        GuessOutputBox.Items.Add(guess.Key);
+                        GuessOutputBox.Items?.Add(guess.Key);
                     }
                     break;
 
@@ -255,22 +252,21 @@ namespace CryptographyCapstone.Pages
                 case Cryptoanalyzer.EncryptionMethods.Affine:
                     foreach (var guess in Cryptoanalyzer.GuessAffineCipher(cipherText))
                     {
-                        GuessOutputBox.Items.Add(guess.Value);
+                        GuessOutputBox.Items?.Add(guess.Value);
                     }
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Multiplicative:
                     foreach (var guess in Cryptoanalyzer.GuessMultiplicativeCipher(cipherText))
                     {
-                        GuessOutputBox.Items.Add(guess.Value);
+                        GuessOutputBox.Items?.Add(guess.Value);
                     }
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Atbash:
-                    GuessOutputBox.Items.Add(Cryptoanalyzer.DecryptAtbashCipher(cipherText));
+                    GuessOutputBox.Items?.Add(Cryptoanalyzer.DecryptAtbashCipher(cipherText));
                     break;
             }
-            //GuessOutputBox.Text = plainText;
         }
 
         private void EncryptionSettingsButton_OnClick(object sender, RoutedEventArgs e)
