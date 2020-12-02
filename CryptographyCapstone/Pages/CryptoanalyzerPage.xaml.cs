@@ -219,8 +219,8 @@ namespace CryptographyCapstone.Pages
                 case Cryptoanalyzer.EncryptionMethods.PolynomialBlock:
                     // Parse the polynomials and decode them
                     string[] blockInputPolynomials = InputBox.Text.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
-                    List<List<double>> blockCoeffs = blockInputPolynomials.Select(PolynomialCipher.ParsePolynomial).ToList();
-                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, int.Parse(rawKey));
+                    List<List<double>> blockCoeffs = blockInputPolynomials.Select(inputPoly => PolynomialCipher.ParsePolynomial(inputPoly)).ToList();
+                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, Int32.Parse(rawKey));
                     break;
                     #endregion
 
@@ -291,6 +291,7 @@ namespace CryptographyCapstone.Pages
                 dataPackage.RequestedOperation = DataPackageOperation.Copy;
                 dataPackage.SetText(GuessOutputBox.SelectedValue.ToString());
                 Clipboard.SetContent(dataPackage);
+                Clipboard.Flush();
             }
             catch {}
         }

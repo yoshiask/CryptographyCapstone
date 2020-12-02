@@ -205,26 +205,22 @@ namespace CryptographyCapstone.Lib
         {
             Debug.WriteLine("Affine brute-force started: " + DateTime.Now);
             var ICList = new Dictionary<Tuple<int, int, string>, double>();
-            for (int i = 1; i <= 26; i++)
+            for (int i = 1; i < 26; i+=2)
             {
-                for (int j = 1; j <= 26; j++)
+                for (int j = 1; j < 26; j+=2)
                 {
-                    try
-                    {
-                        string plainTextGuess = DecryptAffineCipher(cipherText, i, j);
-                        ICList.Add(new Tuple<int, int, string>(i, j, plainTextGuess),
-                            Common.IndexOfCoincidence(plainTextGuess)
-                        );
-                    }
-                    catch (ArgumentException)
-                    {
-                        continue;
-                    }
+                    // 13 is a special case, because 13 * 2 = 26.
+                    if (i == 13) continue;
+
+                    string plainTextGuess = DecryptAffineCipher(cipherText, i, j);
+                    ICList.Add(new Tuple<int, int, string>(i, j, plainTextGuess),
+                        Common.IndexOfCoincidence(plainTextGuess)
+                    );
                 }
             }
 
             var guessedKeys = new Dictionary<Tuple<int, int>, string>();
-            foreach (var ic in ICList.OrderByDescending((d => 1 - d.Value)))
+            foreach (var ic in ICList.OrderByDescending(d => Math.Abs(Common.IC_TELEGRAPHIC_ENGLISH - d.Value)))
             {
                 guessedKeys.Add(new Tuple<int, int>(ic.Key.Item1, ic.Key.Item2), ic.Key.Item3);
             }
