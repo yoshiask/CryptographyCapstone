@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -204,20 +205,23 @@ namespace CryptographyCapstone.Lib
         public static Dictionary<Tuple<int, int>, string> GuessAffineCipher(string cipherText)
         {
             Debug.WriteLine("Affine brute-force started: " + DateTime.Now);
-            var ICList = new Dictionary<Tuple<int, int, string>, double>();
-            for (int i = 1; i < 26; i+=2)
+            var ICList = new ConcurrentDictionary<Tuple<int, int, string>, double>();
+            Parallel.For(1, 26, (i, state) =>
             {
-                for (int j = 1; j < 26; j+=2)
+                if (i % 2 == 0)
+                    return;
+
+                for (int j = 1; j < 26; j += 2)
                 {
                     // 13 is a special case, because 13 * 2 = 26.
                     if (i == 13) continue;
 
                     string plainTextGuess = DecryptAffineCipher(cipherText, i, j);
-                    ICList.Add(new Tuple<int, int, string>(i, j, plainTextGuess),
+                    ICList.TryAdd(new Tuple<int, int, string>(i, j, plainTextGuess),
                         Common.IndexOfCoincidence(plainTextGuess)
                     );
                 }
-            }
+            });
 
             var guessedKeys = new Dictionary<Tuple<int, int>, string>();
             foreach (var ic in ICList.OrderByDescending(d => Math.Abs(Common.IC_TELEGRAPHIC_ENGLISH - d.Value)))
