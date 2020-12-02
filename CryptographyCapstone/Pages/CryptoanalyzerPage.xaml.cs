@@ -218,18 +218,9 @@ namespace CryptographyCapstone.Pages
                 #region Polynomial Block
                 case Cryptoanalyzer.EncryptionMethods.PolynomialBlock:
                     // Parse the polynomials and decode them
-                    List<List<double>> blockCoeffs = new List<List<double>>();
                     string[] blockInputPolynomials = InputBox.Text.Split('\r', '\n', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string inputPoly in blockInputPolynomials)
-                    {
-                        List<double> polyCoeffs = new List<double>();
-                        foreach (string inputCoeff in inputPoly.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            polyCoeffs.Add(Double.Parse(inputCoeff));
-                        }
-                        blockCoeffs.Add(polyCoeffs);
-                    }
-                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, Int32.Parse(rawKey));
+                    List<List<double>> blockCoeffs = blockInputPolynomials.Select(PolynomialCipher.ParsePolynomial).ToList();
+                    plainText = Cryptoanalyzer.DecryptPolynomialBlockCipher(blockCoeffs, int.Parse(rawKey));
                     break;
                     #endregion
 

@@ -241,11 +241,9 @@
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.4.3</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.UI.Xaml">
-      <HintPath>..\..\..\..\.nuget\packages\microsoft.ui.xaml\2.3.191211002\lib\uap10.0\Microsoft.UI.Xaml.winmd</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.Z3.x64">
+      <Version>4.8.9</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

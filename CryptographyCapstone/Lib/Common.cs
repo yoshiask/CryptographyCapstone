@@ -260,8 +260,8 @@ namespace CryptographyCapstone.Lib
 
         public static IEnumerable<string> SplitIntoNGrams(string input, int n)
         {
-            return Enumerable.Range(0, input.Length / n)
-                .Select(i => input.Substring(i * n, n));
+            for (int i = 0; i < input.Length; i += n)
+                yield return input.Substring(i, Math.Min(n, input.Length - i));
         }
 
         public static string PrepForCipher(string text)
@@ -332,7 +332,7 @@ namespace CryptographyCapstone.Lib
             // Accuracy is the maximum relative error; convert to absolute maxError
             double maxError = sign == 0 ? accuracy : value * accuracy;
 
-            int n = (int) Math.Floor(value);
+            int n = (int)Math.Floor(value);
             value -= n;
 
             if (value < maxError)
@@ -345,38 +345,22 @@ namespace CryptographyCapstone.Lib
                 return new Fraction(sign * (n + 1), 1);
             }
 
-            // The lower fraction is 0/1
-            int lower_n = 0;
-            int lower_d = 1;
+            double z = value;
+            int previousDenominator = 0;
+            int denominator = 1;
+            int numerator;
 
-            // The upper fraction is 1/1
-            int upper_n = 1;
-            int upper_d = 1;
-
-            while (true)
+            do
             {
-                // The middle fraction is (lower_n + upper_n) / (lower_d + upper_d)
-                int middle_n = lower_n + upper_n;
-                int middle_d = lower_d + upper_d;
-
-                if (middle_d * (value + maxError) < middle_n)
-                {
-                    // real + error < middle : middle is our new upper
-                    upper_n = middle_n;
-                    upper_d = middle_d;
-                }
-                else if (middle_n < (value - maxError) * middle_d)
-                {
-                    // middle < real - error : middle is our new lower
-                    lower_n = middle_n;
-                    lower_d = middle_d;
-                }
-                else
-                {
-                    // Middle is our best fraction
-                    return new Fraction((n * middle_d + middle_n) * sign, middle_d);
-                }
+                z = 1.0 / (z - (int)z);
+                int temp = denominator;
+                denominator = denominator * (int)z + previousDenominator;
+                previousDenominator = temp;
+                numerator = Convert.ToInt32(value * denominator);
             }
+            while (Math.Abs(value - (double)numerator / denominator) > maxError && z != (int)z);
+
+            return new Fraction((n * denominator + numerator) * sign, denominator);
         }
 
         public int N { get; private set; }

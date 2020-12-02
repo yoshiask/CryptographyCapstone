@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Extreme.Mathematics;
 using Extreme.Mathematics.Curves;
@@ -334,7 +335,7 @@ namespace CryptographyCapstone.Lib
             {
                 string cipherPart = PolynomialCipher.DecodePolynomial(coeff, key);
                 plainText += cipherPart.Replace("Z", " ").Replace("X", "-").Replace("Q", ".");
-                plainText += " ";
+                //plainText += " ";
             }
             return plainText;
         }
@@ -621,6 +622,22 @@ namespace CryptographyCapstone.Lib
             return output;
         }
 
+        public static List<double> ParsePolynomial(string polynomial)
+        {
+            // Insert 1 where x has no coefficient
+            polynomial = Regex.Replace(polynomial, @"(?<!\d+)x", "1x");
+
+            // Extract the coefficients
+            var matches = Regex.Matches(polynomial, @"(?<sign>-?)(?:\s?)(?<value>[\d.]+)+");
+            var coeffs = new List<double>(matches.Count);
+            foreach (Match match in matches)
+            {
+                coeffs.Add(double.Parse(match.Groups["sign"].Value + match.Groups["value"].Value));
+            }
+
+            return coeffs;
+        }
+
         public static List<string> EncodeMessage(string message, int key)
         {
             var output = new List<string>();
@@ -656,7 +673,7 @@ namespace CryptographyCapstone.Lib
             // where the multiplicity of the root is the position of the character,
             // and the value of *a* where x-a=0 is the character itself.
             var roots = new List<double>();
-            int[] lastCoprime = new int[26];
+            int[] lastCoprime = new int[27];
             for (int i = 0; i < lastCoprime.Length; i++)
             {
                 lastCoprime[i] = 1;
@@ -710,7 +727,7 @@ namespace CryptographyCapstone.Lib
                 // Considering ax-b=0, where a and b are the same value,
                 // the roots listed are only x. We need a*x, so to do that
                 // we convert the decimal to a fraction and take the denominator
-                double realValue = roots[i] * Fraction.FromRealNumber(roots[i], 0.01).D;
+                double realValue = Fraction.FromRealNumber(roots[i], 0.01).D;
 
                 // Shift the value back to its character by subtracting the key
                 realValue -= key;
