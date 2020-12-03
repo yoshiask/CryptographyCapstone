@@ -123,6 +123,10 @@ namespace CryptographyCapstone.Pages
                 case Cryptoanalyzer.EncryptionMethods.Ascii:
                     cipherText = Cryptoanalyzer.EncryptAsciiEncoding(plainText);
                     break;
+
+                case Cryptoanalyzer.EncryptionMethods.Vigenere:
+                    cipherText = Cryptoanalyzer.EncryptVigenereCipher(plainText, rawKey);
+                    break;
             }
             OutputBox.Text = cipherText;
         }
@@ -224,6 +228,12 @@ namespace CryptographyCapstone.Pages
                 #region ASCII Encoding
                 case Cryptoanalyzer.EncryptionMethods.Ascii:
                     plainText = Cryptoanalyzer.DecryptAsciiEncoding(cipherText);
+                    break;
+                #endregion
+
+                #region Vigenere
+                case Cryptoanalyzer.EncryptionMethods.Vigenere:
+                    plainText = Cryptoanalyzer.DecryptVigenereCipher(cipherText, rawKey);
                     break;
                 #endregion
             }

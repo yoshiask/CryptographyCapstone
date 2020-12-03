@@ -39,6 +39,10 @@ namespace CryptographyCapstone.Lib
         {
             return EncryptShiftCipher(cipherText, -key);
         }
+        public static char DecryptShiftCipher(char cipherText, int key)
+        {
+            return EncryptShiftCipher(cipherText, -key);
+        }
 
         public static Dictionary<int, string> GuessShiftCipher(string cipherText)
         {
@@ -100,17 +104,28 @@ namespace CryptographyCapstone.Lib
             return cipherText;
         }
 
-        public static string EncryptVigenereCipher(string plainText, int key)
+        public static string EncryptVigenereCipher(string plainText, string key)
         {
-            // TODO: This is wrong, fix it
             // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
             string cipherText = "";
-            foreach (char ch in plainText)
+            for (int i = 0; i < plainText.Length; i++)
             {
-                cipherText += EncryptShiftCipher(ch, key);
-                key++;
+                int shiftKey = Common.CharToAlphabetIndex(key[i % key.Length]);
+                cipherText += EncryptShiftCipher(plainText[i], shiftKey);
             }
             return cipherText;
+        }
+
+        public static string DecryptVigenereCipher(string cipherText, string key)
+        {
+            // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
+            string plainText = "";
+            for (int i = 0; i < cipherText.Length; i++)
+            {
+                int shiftKey = Common.CharToAlphabetIndex(key[i % key.Length]);
+                plainText += DecryptShiftCipher(cipherText[i], shiftKey);
+            }
+            return plainText;
         }
 
         #region One-Time Pad
