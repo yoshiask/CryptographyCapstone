@@ -121,7 +121,7 @@ namespace CryptographyCapstone.Pages
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Ascii:
-                    cipherText = Cryptoanalyzer.EncryptAsciiEncoding(plainText);
+                    cipherText = Cryptoanalyzer.EncryptAsciiEncoding(plainText, int.Parse(rawKey));
                     break;
 
                 case Cryptoanalyzer.EncryptionMethods.Vigenere:
@@ -227,7 +227,7 @@ namespace CryptographyCapstone.Pages
 
                 #region ASCII Encoding
                 case Cryptoanalyzer.EncryptionMethods.Ascii:
-                    plainText = Cryptoanalyzer.DecryptAsciiEncoding(cipherText);
+                    plainText = Cryptoanalyzer.DecryptAsciiEncoding(cipherText, int.Parse(rawKey));
                     break;
                 #endregion
 

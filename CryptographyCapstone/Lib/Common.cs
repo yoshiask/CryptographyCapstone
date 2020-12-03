@@ -24,9 +24,9 @@ namespace CryptographyCapstone.Lib
             return encoding.GetBytes(str);
         }
 
-        public static String ToBinary(Byte[] data, int padding)
+        public static String ToBinary(Byte[] data, int padding, int @base = 2)
         {
-            return string.Join(" ", data.Select(byt => Convert.ToString(byt, 2).PadLeft(padding, '0')));
+            return string.Join(" ", data.Select(byt => Convert.ToString(byt, @base).PadLeft(padding, '0')));
         }
         public static String ToBinary(Byte[] data)
         {

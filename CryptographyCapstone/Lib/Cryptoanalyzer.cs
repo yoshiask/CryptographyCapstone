@@ -568,17 +568,17 @@ namespace CryptographyCapstone.Lib
         #endregion
 
         #region ASCII Encoding
-        public static string EncryptAsciiEncoding(string plainText)
+        public static string EncryptAsciiEncoding(string plainText, int @base = 2)
         {
             return Common.ToBinary(Common.ConvertToByteArray(plainText, Encoding.ASCII));
         }
 
-        public static string DecryptAsciiEncoding(string cipherText)
+        public static string DecryptAsciiEncoding(string cipherText, int @base = 2)
         {
             List<byte> bytes = new List<byte>();
             foreach (string byteString in Common.SplitWords(cipherText))
             {
-                bytes.Add(Convert.ToByte(byteString, 2));
+                bytes.Add(Convert.ToByte(byteString, @base));
             }
             return Encoding.ASCII.GetString(bytes.ToArray());
         }
