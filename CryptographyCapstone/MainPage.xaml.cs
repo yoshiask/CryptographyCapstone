@@ -43,6 +43,10 @@ namespace CryptographyCapstone
                 case "Ciphers":
                     MainFrame.Navigate(typeof(Pages.CryptoanalyzerPage));
                     break;
+
+                case "Cryptanalysis Tools":
+                    MainFrame.Navigate(typeof(Pages.CryptanalysisToolsPage));
+                    break;
             }
             
         }

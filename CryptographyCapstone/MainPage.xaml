@@ -21,6 +21,11 @@
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE134;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Cryptanalysis Tools">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
 
         </NavigationView.MenuItems>
         
