@@ -115,7 +115,7 @@ namespace CryptographyCapstone.Pages
 
                 case Cryptoanalyzer.EncryptionMethods.MorseCode:
                     string[] morseCodeChars = rawKey.Split(',', ';', ':', ' ');
-                    cipherText = morseCodeChars.Length != 3
+                    cipherText = morseCodeChars.Length <= 3
                         ? Cryptoanalyzer.EncryptMorseCode(plainText)
                         : Cryptoanalyzer.EncryptMorseCode(plainText, morseCodeChars[0], morseCodeChars[1], morseCodeChars[2]);
                     break;

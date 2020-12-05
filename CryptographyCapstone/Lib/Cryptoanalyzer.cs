@@ -482,7 +482,10 @@ namespace CryptographyCapstone.Lib
             { "9", "----." },
             { "0", "-----" },
         };
-        
+
+        const string DEFAULT_DOT = ".";
+        const string DEFAULT_DASH = "-";
+
         public static string EncryptMorseCode(string plainText)
         {
             return EncryptMorseCode(plainText, ".", "-", " ");
@@ -530,10 +533,19 @@ namespace CryptographyCapstone.Lib
 
         private static Dictionary<string, string> GenerateMorseCodeKey(string dot, string dash)
         {
+            bool replaceDot = dot != DEFAULT_DOT;
+            bool replaceDash = dash != DEFAULT_DASH;
+
+            if (!(replaceDot && replaceDash))
+                return MorseCodeKey;
+
             var key = new Dictionary<string, string>();
             foreach (var pair in MorseCodeKey)
             {
-                key[pair.Key] = pair.Value.Replace(".", dot).Replace("-", dash);
+                if (replaceDot)
+                    key[pair.Key] = pair.Value.Replace(DEFAULT_DOT, dot);
+                if (replaceDash)
+                    key[pair.Key] = key[pair.Key].Replace(DEFAULT_DASH, dash);
             }
             return key;
         }
