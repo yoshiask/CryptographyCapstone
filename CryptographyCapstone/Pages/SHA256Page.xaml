@@ -16,11 +16,20 @@
 
         <TextBox x:Name="InputBox" Margin="10,10,10,0" PlaceholderText="Input" AcceptsReturn="True" TextChanged="InputBox_TextChanged" FontSize="20"/>
 
-        <StackPanel Grid.Row="1" Margin="10,10,10,10" >
-            <TextBox x:Name="HexOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Hexadecimal" IsReadOnly="True" FontSize="20"/>
-            <TextBox x:Name="DecOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Decimal" IsReadOnly="True" FontSize="20"/>
-            <TextBox x:Name="BinOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in Binary" IsReadOnly="True"/>
-            <TextBox x:Name="ASCIIOutputBox" TextWrapping="Wrap" PlaceholderText="Hash in ASCII" IsReadOnly="True" FontSize="20"/>
+        <StackPanel Grid.Row="1" Margin="10,10,10,10">
+            <StackPanel.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="TextWrapping" Value="Wrap"/>
+                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="FontFamily" Value="{StaticResource Monospace}"/>
+                </Style>
+            </StackPanel.Resources>
+            
+            <TextBox x:Name="HexOutputBox" PlaceholderText="Hash in Hexadecimal"/>
+            <TextBox x:Name="DecOutputBox" PlaceholderText="Hash in Decimal"/>
+            <TextBox x:Name="BinOutputBox" PlaceholderText="Hash in Binary"/>
+            <TextBox x:Name="ASCIIOutputBox" PlaceholderText="Hash in ASCII"/>
         </StackPanel>
 
     </Grid>

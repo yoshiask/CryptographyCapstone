@@ -234,22 +234,22 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Extreme.Numerics">
-      <Version>7.0.17</Version>
+      <Version>8.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.11</Version>
+      <Version>6.2.12</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>6.1.1</Version>
+      <Version>7.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
-      <Version>6.1.1</Version>
+      <Version>7.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.4.3</Version>
+      <Version>2.6.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Z3.x64">
-      <Version>4.8.9</Version>
+      <Version>4.8.10</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

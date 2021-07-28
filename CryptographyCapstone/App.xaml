@@ -10,6 +10,8 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
+
+            <FontFamily x:Key="Monospace">JetBrains Mono</FontFamily>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
